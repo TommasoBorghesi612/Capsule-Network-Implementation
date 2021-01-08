@@ -7,13 +7,9 @@ from CapsNet import get_predicting_units
 
 import matplotlib.pyplot as plt
 
-# from tensorflow.examples.tutorials.mnist import input_data
-# mnist = input_data.read_data_sets("MNIST_data/",one_hot=True)
 
 import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-
-# mnist = tf.keras.datasets.mnist.load_data(path='mnist.npz')
 
 tf.compat.v1.disable_eager_execution()
 
@@ -79,7 +75,6 @@ with tf.compat.v1.Session() as sess:
     print('Session start')
     
     sess.run(init)
-    # saver.restore(sess, "./CapsNet_fixed_decoder_loss")
     
     for k in range(1):
                     
@@ -90,24 +85,13 @@ with tf.compat.v1.Session() as sess:
             batch_x = mnist.train.images[i*batch_size:(i+1)*batch_size]
             batch_y = mnist.train.labels[i*batch_size:(i+1)*batch_size]
 
-            # batch_x , batch_y = mnist.train.next_batch(batch_size)        
+   
             sess.run(train_global,feed_dict={X:batch_x,y_true:batch_y})     
-            sess.run(train_average,feed_dict={X:batch_x,y_true:batch_y})     
-            # sess.run(train_details,feed_dict={X:batch_x,y_true:batch_y})
-            # affffff = sess.run(decoder_loss,feed_dict={X:batch_x,y_true:batch_y})
-            # print(affffff)
-            # baffffff = sess.run(difference_error,feed_dict={X:batch_x,y_true:batch_y})
-            # print(baffffff)
-            # print('-----------------')
-
-            # shap = sess.run(asd,feed_dict={X:batch_x,y_true:batch_y})
-            # print(shap)
-
-            # if 10*(i/num_batches)%1 == 0:
-            #     print('Current epoch % progress = {}'.format(i/num_batches))
+            sess.run(train_average,feed_dict={X:batch_x,y_true:batch_y})  
 
         print('Currently on step {}'.format(k))
         print('Accuracy is:')
+        
         # Test the Train Model
         matches = tf.equal(tf.argmax(tf.squeeze(v_softmax), axis=1), tf.argmax(y_true, axis=1))
 
@@ -118,30 +102,17 @@ with tf.compat.v1.Session() as sess:
 
         for j in range (100):
 
-            # batch_size = 100
             batch_acc = sess.run(acc,feed_dict={X:mnist.test.images[100*j:100*(j+1)],y_true:mnist.test.labels[100*j:100*(j+1)]})
             total_acc = total_acc + batch_acc
-            # batch_recon = sess.run(reconstruction_err,feed_dict={X:mnist.test.images[100*j:100*(j+1)],y_true:mnist.test.labels[100*j:100*(j+1)]})
-            # total_recon_error = total_recon_error + batch_recon
-            # batch_loss = sess.run(reconstruction_err_fake,feed_dict={X:mnist.test.images[100*j:100*(j+1)],y_true:mnist.test.labels[100*j:100*(j+1)]})
-            # main_loss = main_loss + batch_loss   
-            # filtered = sess.run(filtered_out,feed_dict={X:mnist.test.images[10:20],y_true:mnist.test.labels[10:20]})
 
         glob_acc = total_acc/100
         print(glob_acc)
-        # print('Reconstrucion Loss is:')
-        # print(total_recon_error)
-        # main_loss = main_loss/100
-        # print('fake error is Loss is:')
-        # print(main_loss)
-        # # print(filtered)
-        # print('\n')
 
-        saver.save(sess, "./trywithv2")
+        saver.save(sess, "./capsnet")
 
 with tf.compat.v1.Session() as sess:
 
-    saver.restore(sess, "./trywithv2")
+    saver.restore(sess, "./capsnet")
     images = sess.run(reconstructed_fake_image,feed_dict={X:mnist.test.images[0:100],y_true:mnist.test.labels[0:100]})
     orig = sess.run(X_image, feed_dict={X: mnist.test.images[0:100],
                                         y_true: mnist.test.labels[0:100]})
